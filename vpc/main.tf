@@ -22,9 +22,9 @@ resource "aws_subnet" "public_subnet" {
     cidr_block = var.public_subnets[count.index]
     availability_zone = data.aws_availability_zones.current.names[count.index]
     map_public_ip_on_launch = var.auto_assign_public_ip
-    tags = merge({
-      Name = "${var.env_name}-subnets"
-    }, var.custom_tags)
+    tags = merge(
+      {Name = "${var.env_name}-subnets"}, 
+      var.custom_tags)
 }
 
 resource "aws_internet_gateway" "this" {
@@ -88,4 +88,12 @@ resource "aws_route_table_association" "private-rta" {
     route_table_id = aws_route_table.private-rt[0].id
     subnet_id = aws_subnet.private_subnet[count.index].id
   
+}
+
+resource "aws_vpc_endpoint" "s3_endpoint" {
+    count = local.create_private_subnets && var.create_s3_endpoint ? 1 : 0
+ 
+    service_name = "com.amazonaws.eu-central-1.s3"
+    vpc_id = aws_vpc.this.id
+    route_table_ids = [aws_route_table.private_rt[0].id]
 }

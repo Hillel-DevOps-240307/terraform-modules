@@ -33,3 +33,9 @@ variable "custom_tags" {
     type = map(string)
     default = {}
 }
+
+variable "create_s3_endpoint" {
+    description = "Flag to create S3 endpoint for provate networks"
+    type = bool
+    default = false
+}
